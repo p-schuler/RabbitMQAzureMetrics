@@ -10,15 +10,16 @@ namespace RabbitMQAzureMetrics
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection serviceCollection, RabbitMetricsConfiguration configuration, string appInsightInstrumentationKey)
+        public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection serviceCollection, RabbitMetricsConfiguration configuration)
         {
+            configuration.Validate();
             serviceCollection.AddSingleton(configuration);
             serviceCollection.AddHostedService<RabbitMqBackgroundService>();
 
             var appInsightsOptions = new ApplicationInsightsServiceOptions
             {
                 EnableAdaptiveSampling = false,
-                InstrumentationKey = appInsightInstrumentationKey
+                InstrumentationKey = configuration.AppInsightsKey
             };
 
             serviceCollection.AddApplicationInsightsTelemetry(appInsightsOptions);

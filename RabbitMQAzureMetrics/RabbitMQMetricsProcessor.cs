@@ -14,6 +14,7 @@ namespace RabbitMQAzureMetrics
 {
     public class RabbitMQMetricsProcessor
     {
+        private const int MinPollingInterval = 5_000;
         private readonly HttpClient httpClient;
         private CancellationTokenSource ctsRunning;
         private Task runningTask;
@@ -21,8 +22,10 @@ namespace RabbitMQAzureMetrics
         private Dictionary<RabbitMqMetricsEndpoints, Uri> endPointUris;
         private Dictionary<RabbitMqMetricsEndpoints, IValuePublisher> valuePublishers;
         private readonly TelemetryClient client;
+        private readonly RabbitMetricsConfiguration configuration;
         private readonly ILogger logger;
         private readonly IApplicationLifetime appLifetime;
+        private DateTime lastFlush;
         private static readonly RabbitMqMetricsEndpoints[] allEndpoints = (RabbitMqMetricsEndpoints[])Enum.GetValues(typeof(RabbitMqMetricsEndpoints));
 
         enum RabbitMqMetricsEndpoints
@@ -41,6 +44,7 @@ namespace RabbitMQAzureMetrics
             var scheme = configuration.UseSSL ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
             this.baseUri = new Uri($"{scheme}://{configuration.Hostname}:{configuration.Port}");
             this.client = client;
+            this.configuration = configuration;
             this.logger = logger;
             this.appLifetime = appLifetime;
 
@@ -77,6 +81,8 @@ namespace RabbitMQAzureMetrics
 
             runningToken.Cancel();
             await runningTask;
+
+            this.client.Flush();
             runningTask = null;
         }
 
@@ -97,17 +103,17 @@ namespace RabbitMQAzureMetrics
                         valuePublishers[currentEndPoint].Publish(info);
                     }
 
-                    client.Flush();
+                    FlushIfRequired();
 
                     httpRequestExceptionCount = 0;
-                    await Task.Delay(5_000, cancellationToken);
+                    await Task.Delay(Math.Max(MinPollingInterval, this.configuration.PollingInterval), cancellationToken);
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException ex)
                 {
-                    this.logger.LogError("Failed to connect to RabbitMQ at {hostname}", this.baseUri.AbsoluteUri);
+                    this.logger.LogError("Failed to connect to RabbitMQ at {hostname}. Error: ", this.baseUri.AbsoluteUri, ex.Message);
                     if (httpRequestExceptionCount++ < maxRequestExceptionCount)
                     {
-                        // additional sleep
+                        // todo: add exponential backoff
                         await Task.Delay(15_000);
                     }
                 }
@@ -125,6 +131,22 @@ namespace RabbitMQAzureMetrics
                     break;
                 }
             }
+        }
+
+        private void FlushIfRequired()
+        {
+            var now = DateTime.UtcNow;
+
+            // if we have the same configuration for flush delay and the polling
+            // we always flush, as we only flush after we did poll the values
+            if (this.configuration.FlushDelay != this.configuration.PollingInterval 
+            && (now - lastFlush).TotalMilliseconds < this.configuration.FlushDelay)
+            {
+                return;
+            }
+
+            lastFlush = now;
+            client.Flush();
         }
 
         private void RegisterEndpointAndPublishers()

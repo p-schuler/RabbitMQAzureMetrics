@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace RabbitMQAzureMetrics
 {
@@ -16,6 +17,11 @@ namespace RabbitMQAzureMetrics
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureAppConfiguration((ctx, builder) => 
+                {
+                    builder.AddJsonFile("appsettings.json", false);
+                    builder.AddJsonFile("appesttings.local.json", true);
+                })
                 .UseKestrel()
                 .UseIISIntegration()
                 .UseStartup<Startup>()

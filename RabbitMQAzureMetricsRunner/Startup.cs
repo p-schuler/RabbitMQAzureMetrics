@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace RabbitMQAzureMetrics
 {
@@ -16,14 +17,10 @@ namespace RabbitMQAzureMetrics
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var rabbitConfig = new RabbitMetricsConfiguration
-            {
-                Hostname = "localhost",
-                UserName = "guest",
-                Password = "guest"
-            };
+            var config = new RabbitMetricsConfiguration();
+            this.configuration.Bind(config);
 
-            services.AddRabbitMqMetrics(rabbitConfig, "[your app insights key]");
+            services.AddRabbitMqMetrics(config);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) { }

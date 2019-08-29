@@ -19,4 +19,14 @@
     <ProjectReference Include="..\RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <None Update="appesttings.local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
