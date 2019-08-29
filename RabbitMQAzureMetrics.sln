@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQAzureMetrics", "RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj", "{705FA9C6-D15D-48E7-94DB-F412C72E8539}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQAzureMetricsRunner", "RabbitMQAzureMetricsRunner\RabbitMQAzureMetricsRunner.csproj", "{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{705FA9C6-D15D-48E7-94DB-F412C72E8539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{705FA9C6-D15D-48E7-94DB-F412C72E8539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{705FA9C6-D15D-48E7-94DB-F412C72E8539}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{705FA9C6-D15D-48E7-94DB-F412C72E8539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {490EA349-0174-4DE2-AF56-A4705F9ED1BB}
+	EndGlobalSection
+EndGlobal
