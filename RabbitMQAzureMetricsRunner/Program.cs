@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace RabbitMQAzureMetrics
 {
@@ -10,22 +10,41 @@ namespace RabbitMQAzureMetrics
     {
         static async Task Main(string[] args)
         {
-            var webHost = BuildWebHost(args);
-            await webHost.RunAsync();
+            var hostBuilder = Setup(args);
+            using (var host = hostBuilder.Build())
+            {
+                await host.StartAsync();
+                await host.WaitForShutdownAsync();
+            }
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureAppConfiguration((ctx, builder) => 
+        private static IHostBuilder Setup(string[] args)
+        {
+            var hostBuilder = new HostBuilder()
+                .ConfigureLogging((ctx, config) =>
                 {
-                    builder.AddJsonFile("appsettings.json", false);
-                    builder.AddJsonFile("appesttings.local.json", true);
+                    config.AddConsole();
                 })
-                .UseKestrel()
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+                .ConfigureHostConfiguration(cfg =>
+                {
+                    cfg.AddEnvironmentVariables();
+                })
+                .ConfigureAppConfiguration((ctx, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", true);
+                    config.AddJsonFile("appesttings.local.json", optional: true);
+                    config.AddCommandLine(args);
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    var config = new RabbitMetricsConfiguration();
+                    hostContext.Configuration.Bind(config);
+                    services.AddRabbitMqMetrics(config);
+                })
+                .UseConsoleLifetime();
 
+            return hostBuilder;
+        }
     }
 }

@@ -1,10 +1,6 @@
-﻿using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace RabbitMQAzureMetrics
 {
@@ -16,14 +12,10 @@ namespace RabbitMQAzureMetrics
             serviceCollection.AddSingleton(configuration);
             serviceCollection.AddHostedService<RabbitMqBackgroundService>();
 
-            var appInsightsOptions = new ApplicationInsightsServiceOptions
-            {
-                EnableAdaptiveSampling = false,
-                InstrumentationKey = configuration.AppInsightsKey
-            };
-
-            serviceCollection.AddApplicationInsightsTelemetry(appInsightsOptions);
-
+            var telemetryConfig = TelemetryConfiguration.CreateDefault();
+            telemetryConfig.InstrumentationKey = configuration.AppInsightsKey;
+            var telemetryClient = new TelemetryClient(telemetryConfig);
+            serviceCollection.AddSingleton(telemetryClient);
             return serviceCollection;
         }
     }

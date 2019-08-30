@@ -110,7 +110,7 @@ namespace RabbitMQAzureMetrics
                 }
                 catch (HttpRequestException ex)
                 {
-                    this.logger.LogError("Failed to connect to RabbitMQ at {hostname}. Error: ", this.baseUri.AbsoluteUri, ex.Message);
+                    this.logger.LogError("Failed to connect to RabbitMQ at {hostname}. Error: {error}", this.baseUri.AbsoluteUri, ex.Message);
                     if (httpRequestExceptionCount++ < maxRequestExceptionCount)
                     {
                         // todo: add exponential backoff

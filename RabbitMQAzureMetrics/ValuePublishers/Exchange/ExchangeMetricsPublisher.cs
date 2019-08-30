@@ -2,6 +2,7 @@
 using Microsoft.ApplicationInsights.Metrics;
 using Newtonsoft.Json.Linq;
 using RabbitMQAzureMetrics.Extensions;
+using System;
 
 namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
@@ -18,6 +19,18 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
         {
             MessageStats + ".publish_in",
             MessageStats + ".publish_out"
+        };
+
+        private readonly static string[] DimensionTranslations = new[]
+        {
+            "Messages published in", //MessageStats + ".publish_in",
+            "Messages published out", //MessageStats + ".publish_out"
+        };
+
+        private readonly static string[] DimensionRateTranslations = new[]
+        {
+            "Rate: Messages published in", //MessageStats + ".publish_in",
+            "Rate: Messages published out", //MessageStats + ".publish_out"
         };
 
         public ExchangeMetricsPublisher(TelemetryClient client)
@@ -37,14 +50,22 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 
             foreach (var q in queues)
             {
-                if (q.SelectToken(MessageStats) == null) continue;
+                if (q.SelectToken(MessageStats) == null)
+                {
+                    continue;
+                }
 
                 var exchangeName = q.Value<string>("name");
+                if (string.IsNullOrEmpty(exchangeName))
+                {
+                    continue;
+                }
+
                 for (var i = 0; i < PathsWithDetailRate.Length; i++)
                 {
                     var pathValue = PathsWithDetailRate[i];
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), pathValue, exchangeName);
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}{DetailsRateSuffix}"), pathValue + DetailsRateSuffix, exchangeName);
+                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), DimensionTranslations[i], exchangeName);
+                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], exchangeName);
                 }
             }
         }
