@@ -2,6 +2,7 @@
 using Microsoft.ApplicationInsights.Metrics;
 using Newtonsoft.Json.Linq;
 using RabbitMQAzureMetrics.Extensions;
+using System;
 
 namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
@@ -13,6 +14,26 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 
         private const string MessageStats = "message_stats";
         private const string DetailsRateSuffix = "_details.rate";
+
+        private readonly static string[] FloatPaths = new[]
+        {
+            "consumer_utilisation"
+        };
+
+        private readonly static string[] FloatPathsDimensionTranslations = new[]
+        {
+            "Consumer: Utilisation"
+        };
+
+        private readonly static string[] Paths = new[]
+        {
+            "consumers"
+        };
+
+        private readonly static string[] PathsDimensionTranslations = new[]
+        {
+            "Consumer: Count"
+        };
 
         private readonly static string[] PathsWithDetailRate = new[]
         {
@@ -28,7 +49,7 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             MessageStats + ".redeliver"
         };
 
-        private readonly static string[] DimensionTranslations = new[]
+        private readonly static string[] StatsDimensionTranslations = new[]
         {
             "Total number of messages",
             "Messages ready for delivery",
@@ -42,7 +63,7 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Count of subset of messages in deliver_get which had the redelivered flag set.", // redliver
         };
 
-        private readonly static string[] DimensionRateTranslations = new []
+        private readonly static string[] StatsDimensionRateTranslations = new[]
         {
             "Rate: Total number of messages", //"messages",
             "Rate: Messages ready for delivery", //"messages_ready",
@@ -54,6 +75,11 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Rate: Messages delivered in no-ack mode in response to basic.get", //MessageStats + ".get_no_ack",
             "Rate: Message publishing", //MessageStats + ".publish",
             "Rate: Count of subset of messages in deliver_get which had the redelivered flag set.", //MessageStats + ".redeliver"
+        };
+
+        private readonly static Action<JToken, Metric, string>[] Calculations = new Action<JToken, Metric, string>[]
+        {
+            CalculateDeliveryDelay
         };
 
         public QueueMetricsPublisher(TelemetryClient client)
@@ -74,13 +100,47 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             foreach (var q in queues)
             {
                 var qName = q.Value<string>("name");
+
                 for (var i = 0; i < PathsWithDetailRate.Length; i++)
                 {
                     var pathValue = PathsWithDetailRate[i];
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), DimensionTranslations[i], qName);
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], qName);
+                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), StatsDimensionTranslations[i], qName);
+                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}{DetailsRateSuffix}"), StatsDimensionRateTranslations[i], qName);
+                }
+
+                for (var i = 0; i < Paths.Length; i++)
+                {
+                    var pathValue = Paths[i];
+                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), PathsDimensionTranslations[i], qName);
+                }
+
+                for (var i = 0; i < FloatPaths.Length; i++)
+                {
+                    var pathValue = FloatPaths[i];
+                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}"), FloatPathsDimensionTranslations[i], qName);
+                }
+
+                for (var i = 0; i < Calculations.Length; i++)
+                {
+                    Calculations[i](q, queueStats, qName);
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the delay of the delivery relative to the publishing of the messages and publishes
+        /// that value in the passed in metric.
+        /// </summary>
+        /// <param name="jToken"></param>
+        /// <param name="targetMetric"></param>
+        /// <param name="queueName"></param>
+        private static void CalculateDeliveryDelay(JToken jToken, Metric targetMetric, string queueName)
+        {
+            var deliverRate = jToken.ValueFromPath<float>(MessageStats + ".deliver_get" + DetailsRateSuffix);
+            var publishRate = jToken.ValueFromPath<float>(MessageStats + ".publish" + DetailsRateSuffix);
+
+            var relativeDelay = (publishRate > 0) ? Math.Round(1 - (deliverRate / publishRate), 2) : 0;
+            targetMetric.TrackValue(relativeDelay, "Rate: delivery delay", queueName);
         }
     }
 }

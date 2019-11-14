@@ -65,7 +65,7 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
                 {
                     var pathValue = PathsWithDetailRate[i];
                     queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), DimensionTranslations[i], exchangeName);
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], exchangeName);
+                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], exchangeName);
                 }
             }
         }

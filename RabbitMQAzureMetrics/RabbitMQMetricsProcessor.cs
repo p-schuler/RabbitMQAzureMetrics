@@ -35,10 +35,10 @@ namespace RabbitMQAzureMetrics
             Exchange
         }
 
-        public RabbitMQMetricsProcessor(TelemetryClient client, 
-            RabbitMetricsConfiguration configuration, 
-            ILogger logger,
-            IApplicationLifetime appLifetime = null)
+        public RabbitMQMetricsProcessor(TelemetryClient client,
+                                        RabbitMetricsConfiguration configuration,
+                                        ILogger logger,
+                                        IApplicationLifetime appLifetime = null)
         {
             this.httpClient = new HttpClient(new HttpClientHandler { Credentials = new NetworkCredential(configuration.UserName, configuration.Password) });
             var scheme = configuration.UseSSL ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;

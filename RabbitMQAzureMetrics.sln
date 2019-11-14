@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQAzureMetrics", "RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj", "{705FA9C6-D15D-48E7-94DB-F412C72E8539}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQAzureMetrics", "RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj", "{705FA9C6-D15D-48E7-94DB-F412C72E8539}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQAzureMetricsRunner", "RabbitMQAzureMetricsRunner\RabbitMQAzureMetricsRunner.csproj", "{F2B0D00F-B1FF-4D45-9526-C102FE9B1DD8}"
 EndProject
