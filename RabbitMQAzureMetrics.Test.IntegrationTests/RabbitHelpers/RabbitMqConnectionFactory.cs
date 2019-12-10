@@ -16,7 +16,7 @@ namespace RabbitMQAzureMetrics.Test.IntegrationTests
             var factory = new ConnectionFactory() { HostName = "localhost" };
             var policy = Policy
               .Handle<BrokerUnreachableException>()
-              .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(2));
+              .WaitAndRetryAsync(30, retryAttempt => TimeSpan.FromSeconds(2));
 
             IConnection connection = null;
             IModel model = null;
