@@ -56,7 +56,7 @@ namespace RabbitMQAzureMetrics.Test.IntegrationTests
         }
 
         [Test]
-        [Ignore("use for local debugging only to have metrics being generated"]
+        [Ignore("use for local debugging only to have metrics being generated")]
         public async Task Metrics_Generator()
         {
             await Task.Delay(60_000);
