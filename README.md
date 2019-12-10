@@ -4,12 +4,10 @@ Collects metrics from RabbitMq and publishes them into an App Insight instance o
 The code is accesses the [RabbitMQ management HTTP API](https://rawcdn.githack.com/rabbitmq/rabbitmq-management/v3.8.2/priv/www/api/index.html). Not all metrics that this API exposes are currently collected. See [Collected Metrics](#collected-metrics)
 
 ## Build status
-Due to security considerations, build logs are not publicly available.
-
 | Service Environment      | Status |
 | ---                      | ---    |
-| Master                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Dev%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=14)|
-| Dev                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Master%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=13)|
+| Master                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Master%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=14)|
+| Dev                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Dev%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=13)|
 
 
 # Supported Versions
@@ -34,7 +32,7 @@ This code was tested against management version of RabbitMQ 3.8.2. Other version
 7. Click on "Custom metrics Preview" -> Check "Enable alerting on custom metric dimensions" -> Save
 
 ## Metrics collector
-1. docker run -d --link local-rabbit --env AppInsightsKey={your app insights key} --name metrics-collector pschuler.azurecr.io/rabbitmqmetricspublisher:latest
+1. docker run -d --link local-rabbit --env AppInsightsKey={your app insights key} --name metrics-collector pschuler/rabbitmqmetricspublisher:latest
 2. check the logs of the metrics collector. You should see that it started the processor
 
 ## Start publishing messages
