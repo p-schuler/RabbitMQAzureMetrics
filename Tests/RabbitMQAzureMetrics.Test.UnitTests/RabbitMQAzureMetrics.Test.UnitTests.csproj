@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj" />
+    <ProjectReference Include="..\..\RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj" />
   </ItemGroup>
 
   <ItemGroup>
