@@ -1,17 +1,10 @@
-﻿using Microsoft.ApplicationInsights;
-using RabbitMQAzureMetrics.Consumer;
-using RabbitMQAzureMetrics.ValuePublishers;
-using RabbitMQAzureMetrics.ValuePublishers.AppInsight;
-using RabbitMQAzureMetrics.ValuePublishers.Overview;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace RabbitMQAzureMetrics.Processors
+﻿namespace RabbitMQAzureMetrics.Processors
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using RabbitMQAzureMetrics.Consumer;
+    using RabbitMQAzureMetrics.ValuePublishers;
+
     public class DefaultMetricProcessor : IMetricProcessor
     {
         private readonly IMetricConsumer consumer;
@@ -25,8 +18,8 @@ namespace RabbitMQAzureMetrics.Processors
 
         public async Task ProcessAsync(CancellationToken cancellationToken = default)
         {
-            var values = await consumer.ConsumeAsync(cancellationToken);
-            await publisher.PublishAsync(values);
+            var values = await this.consumer.ConsumeAsync(cancellationToken);
+            await this.publisher.PublishAsync(values);
         }
     }
 }

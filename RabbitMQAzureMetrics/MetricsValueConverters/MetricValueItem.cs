@@ -4,11 +4,12 @@
     {
         public MetricValueItem(double value, string[] dimensions)
         {
-            Value = value;
-            Dimensions = dimensions;
+            this.Value = value;
+            this.Dimensions = dimensions;
         }
 
         public string[] Dimensions { get; }
+
         public double Value { get; }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Polly;
-
-namespace RabbitMQAzureMetrics.Extensions
+﻿namespace RabbitMQAzureMetrics.Extensions
 {
+    using Microsoft.Extensions.Logging;
+    using Polly;
+
     public static class PollyContextExtensions
     {
         private static readonly string LoggerKey = "ILogger";

@@ -1,14 +1,11 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Metrics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RabbitMQAzureMetrics.ValuePublishers.AppInsight
+﻿namespace RabbitMQAzureMetrics.ValuePublishers.AppInsight
 {
-    static class MetricsDefinitions
+    using Microsoft.ApplicationInsights;
+    using Microsoft.ApplicationInsights.Metrics;
+
+    internal static class MetricsDefinitions
     {
-        const string MetricsNamespace = "rabbitmq";
+        private const string MetricsNamespace = "rabbitmq";
 
         public static Metric CreateOverviewMetric(TelemetryClient telemetryClient)
         {

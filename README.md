@@ -1,7 +1,32 @@
-# RabbitMqAzureMetrics
+# RabbitMQ Azure Application Insights Metrics Collector
 Collects metrics from RabbitMq and publishes them into an App Insight instance on Azure. The metric collector is pulling metrics from a RabbitMQ instance, parses them and publishes them using different custom dimensions. 
 
+The code is accesses the [RabbitMQ management HTTP API](https://rawcdn.githack.com/rabbitmq/rabbitmq-management/v3.8.2/priv/www/api/index.html). Not all metrics that this API exposes are currently collected. See [Collected Metrics](#collected-metrics)
 
+# Supported Versions
+This code was tested against management version of RabbitMQ 3.8.2. Other versions might work unless RabbitMQ changes the API format of the management metrics API.
+
+# Prerequisits
+1. [RabbitMQ](#rabbitmq) instance with the [Managment Plugin](https://www.rabbitmq.com/management.html)
+2. Application Insights
+3. Docker (you can host the publisher anywhere, docker is what this setup provides)
+
+# Setup
+## RabbitMQ
+1. docker run -d --hostname localhost --name local-rabbit -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+2. validate you can acess the management portal by pointing your browser to http://localhost:15672 (username: guest, password: guest)
+
+## Application Insights
+1. Open your azure portal
+2. Create a Resource -> Application Insights
+3. Select Subscription, Resource Group, a Region and chose a name -> Review + Create
+5. Once the Application Insights is created, open it and copy the Instrumentation Key from the Overview Tab
+6. Select Usage and estimated Cost
+7. Click on "Custom metrics Preview" -> Check "Enable alerting on custom metric dimensions" -> Save
+
+## Metrics collector
+1. docker run -d --link local-rabbit --env AppInsightsKey={your app insights key} --name metrics-collector pschuler.azurecr.io/rabbitmqmetricspublisher:latest
+2. 
 
 # Collected Metrics
 Currently those metrics are being collected
