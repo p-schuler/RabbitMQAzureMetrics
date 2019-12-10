@@ -5,9 +5,9 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["RabbitMQAzureMetricsRunner/RabbitMQAzureMetricsRunner.csproj", "RabbitMQAzureMetricsRunner/"]
-COPY ["RabbitMQAzureMetrics/RabbitMQAzureMetrics.csproj", "RabbitMQAzureMetrics/"]
-RUN dotnet restore "RabbitMQAzureMetricsRunner/RabbitMQAzureMetricsRunner.csproj"
+COPY ["./RabbitMQAzureMetricsRunner/RabbitMQAzureMetricsRunner.csproj", "RabbitMQAzureMetricsRunner/"]
+COPY ["./RabbitMQAzureMetrics/RabbitMQAzureMetrics.csproj", "RabbitMQAzureMetrics/"]
+RUN dotnet restore "./RabbitMQAzureMetricsRunner/RabbitMQAzureMetricsRunner.csproj"
 COPY . .
 WORKDIR "/src/RabbitMQAzureMetricsRunner"
 RUN dotnet build "RabbitMQAzureMetricsRunner.csproj" -c Release -o /app/build
