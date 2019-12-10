@@ -1,11 +1,12 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RabbitMQAzureMetrics.ValuePublishers;
+using RabbitMQAzureMetrics.Consumer;
+using RabbitMQAzureMetrics.Processors;
+using RabbitMQAzureMetrics.ValuePublishers.AppInsight;
 using RabbitMQAzureMetrics.ValuePublishers.Overview;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,18 +16,14 @@ namespace RabbitMQAzureMetrics
     public class RabbitMQMetricsProcessor
     {
         private const int MinPollingInterval = 5_000;
-        private readonly HttpClient httpClient;
         private CancellationTokenSource ctsRunning;
         private Task runningTask;
-        private readonly Uri baseUri;
-        private Dictionary<RabbitMqMetricsEndpoints, Uri> endPointUris;
-        private Dictionary<RabbitMqMetricsEndpoints, IValuePublisher> valuePublishers;
+        private IList<IMetricProcessor> processors;
         private readonly TelemetryClient client;
         private readonly RabbitMetricsConfiguration configuration;
         private readonly ILogger logger;
-        private readonly IApplicationLifetime appLifetime;
+        private readonly IHostApplicationLifetime appLifetime;
         private DateTime lastFlush;
-        private static readonly RabbitMqMetricsEndpoints[] allEndpoints = (RabbitMqMetricsEndpoints[])Enum.GetValues(typeof(RabbitMqMetricsEndpoints));
 
         enum RabbitMqMetricsEndpoints
         {
@@ -38,17 +35,18 @@ namespace RabbitMQAzureMetrics
         public RabbitMQMetricsProcessor(TelemetryClient client,
                                         RabbitMetricsConfiguration configuration,
                                         ILogger logger,
-                                        IApplicationLifetime appLifetime = null)
+                                        IHttpClientFactory httpClientFactory,
+                                        ILogger<RabbitMqMetricsConsumer> metricsConsumerLogger,
+                                        IHostApplicationLifetime appLifetime = null)
         {
-            this.httpClient = new HttpClient(new HttpClientHandler { Credentials = new NetworkCredential(configuration.UserName, configuration.Password) });
-            var scheme = configuration.UseSSL ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
-            this.baseUri = new Uri($"{scheme}://{configuration.Hostname}:{configuration.Port}");
             this.client = client;
             this.configuration = configuration;
             this.logger = logger;
             this.appLifetime = appLifetime;
 
-            RegisterEndpointAndPublishers();
+            processors = CreateProcessors(configuration, client, httpClientFactory, metricsConsumerLogger);
+
+            logger.LogInformation("Created {0} processors", processors.Count);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -88,34 +86,19 @@ namespace RabbitMQAzureMetrics
 
         private async Task RunnerAsync(CancellationToken cancellationToken)
         {
-            int httpRequestExceptionCount = 0;
-            int maxRequestExceptionCount = 20;
-
+            logger.LogInformation("Metrics processor is running");
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    for (var i = 0; i < allEndpoints.Length; i++)
+                    for (var i = 0; i < processors.Count; i++)
                     {
-                        var currentEndPoint = allEndpoints[i];
-
-                        var info = await httpClient.GetStringAsync(endPointUris[currentEndPoint]);
-                        valuePublishers[currentEndPoint].Publish(info);
+                        await processors[i].ProcessAsync();
                     }
 
                     FlushIfRequired();
 
-                    httpRequestExceptionCount = 0;
                     await Task.Delay(Math.Max(MinPollingInterval, this.configuration.PollingInterval), cancellationToken);
-                }
-                catch (HttpRequestException ex)
-                {
-                    this.logger.LogError("Failed to connect to RabbitMQ at {hostname}. Error: {error}", this.baseUri.AbsoluteUri, ex.Message);
-                    if (httpRequestExceptionCount++ < maxRequestExceptionCount)
-                    {
-                        // todo: add exponential backoff
-                        await Task.Delay(15_000);
-                    }
                 }
                 catch (TaskCanceledException)
                 {
@@ -149,18 +132,39 @@ namespace RabbitMQAzureMetrics
             client.Flush();
         }
 
-        private void RegisterEndpointAndPublishers()
+        private static IList<IMetricProcessor> CreateProcessors(RabbitMetricsConfiguration configuration, TelemetryClient client, IHttpClientFactory httpClientFactory, ILogger<RabbitMqMetricsConsumer> logger)
         {
-            endPointUris = new Dictionary<RabbitMqMetricsEndpoints, Uri>(allEndpoints.Length);
-            valuePublishers = new Dictionary<RabbitMqMetricsEndpoints, IValuePublisher>(allEndpoints.Length);
+            var queueProcessor = new DefaultMetricProcessor(
+                        new RabbitMqMetricsConsumer(RabbitMqMetricsConsumer.QueuePath,
+                                             configuration,
+                                             logger,
+                                             new QueueValueConverter(),
+                                             httpClientFactory),
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateQueueMetric(client)));
 
-            endPointUris.Add(RabbitMqMetricsEndpoints.Overview, new Uri(baseUri, "api/overview"));
-            endPointUris.Add(RabbitMqMetricsEndpoints.Queue, new Uri(baseUri, "api/queues"));
-            endPointUris.Add(RabbitMqMetricsEndpoints.Exchange, new Uri(baseUri, "api/exchanges"));
+            var overviewProcessor = new DefaultMetricProcessor(
+                        new RabbitMqMetricsConsumer(RabbitMqMetricsConsumer.OverviewPath,
+                                             configuration,
+                                             logger,
+                                             new MessageOverviewValueConverter(),
+                                             httpClientFactory),
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateOverviewMetric(client)));
 
-            valuePublishers.Add(RabbitMqMetricsEndpoints.Overview, new MessageOverviewMetricsPublisher(client));
-            valuePublishers.Add(RabbitMqMetricsEndpoints.Queue, new QueueMetricsPublisher(client));
-            valuePublishers.Add(RabbitMqMetricsEndpoints.Exchange, new ExchangeMetricsPublisher(client));
+            var exchangeProcessor = new DefaultMetricProcessor(
+                        new RabbitMqMetricsConsumer(RabbitMqMetricsConsumer.ExchangePath,
+                                             configuration,
+                                             logger,
+                                             new ExchangeValueConverter(),
+                                             httpClientFactory),
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateExchangewMetric(client)));
+
+            var processors = new List<IMetricProcessor>(3);
+
+            processors.Add(queueProcessor);
+            processors.Add(overviewProcessor);
+            processors.Add(exchangeProcessor);
+
+            return processors;
         }
     }
 }

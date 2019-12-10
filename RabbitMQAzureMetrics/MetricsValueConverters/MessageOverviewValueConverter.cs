@@ -1,16 +1,12 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Metrics;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using RabbitMQAzureMetrics.Extensions;
+using RabbitMQAzureMetrics.MetricsValueConverters;
+using System.Collections.Generic;
 
 namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
-    public class MessageOverviewMetricsPublisher : ValuePublisher
+    public class MessageOverviewValueConverter : IMetricsValueConverter
     {
-        private readonly TelemetryClient client;
-
-        private Metric churnRates;
-
         private readonly static string[] ChurnRatesPaths = new[]
         {
             "channel_closed",
@@ -34,27 +30,34 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
         };
 
         private const string ChurnRates = "churn_rates";
-        
-        public MessageOverviewMetricsPublisher(TelemetryClient client)
+
+        private static List<string> publishedMetrics;
+
+        public static IList<string> PublishedMetrics
         {
-            this.client = client;
-            InitializeMetrics();
+            get
+            {
+                if (publishedMetrics == null)
+                {
+                    publishedMetrics = new List<string>(DimensionTranslations);
+                }
+                return publishedMetrics;
+            }
         }
 
-        private void InitializeMetrics()
+        public MetricValueCollectionWrapper Convert(string info)
         {
-            churnRates = client.GetMetric(new MetricIdentifier(MetricsNamespace, ChurnRates, "type"));
-        }
+            var collection = new MetricValueCollectionWrapper();
 
-        public override void Publish(string info)
-        {
             var overviewInfo = JObject.Parse(info);
 
             for (var i = 0; i < ChurnRatesPaths.Length; i++)
             {
                 var path = ChurnRatesPaths[i];
-                churnRates.TrackValue(overviewInfo.ValueFromPath<int>($"{ChurnRates}.{path}"), DimensionTranslations[i]);
+                collection.Add(overviewInfo.ValueFromPath<float?>($"{ChurnRates}.{path}"), DimensionTranslations[i]);
             }
+
+            return collection;
         }
     }
 }

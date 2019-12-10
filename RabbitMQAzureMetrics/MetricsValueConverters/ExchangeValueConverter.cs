@@ -1,19 +1,29 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Metrics;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using RabbitMQAzureMetrics.Extensions;
-using System;
+using RabbitMQAzureMetrics.MetricsValueConverters;
+using System.Collections.Generic;
 
 namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
-    public class ExchangeMetricsPublisher : ValuePublisher
+    public class ExchangeValueConverter : IMetricsValueConverter
     {
-        private readonly TelemetryClient client;
-
-        private Metric queueStats;
-
         private const string MessageStats = "message_stats";
         private const string DetailsRateSuffix = "_details.rate";
+
+        private static List<string> publishedMetrics;
+
+        public static IList<string> PublishedMetrics 
+        {
+            get
+            {
+                if (publishedMetrics == null)
+                {
+                    publishedMetrics = new List<string>(DimensionTranslations);
+                    publishedMetrics.AddRange(DimensionRateTranslations);
+                }
+                return publishedMetrics;
+            }
+        }
 
         private readonly static string[] PathsWithDetailRate = new[]
         {
@@ -33,22 +43,13 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Rate: Messages published out", //MessageStats + ".publish_out"
         };
 
-        public ExchangeMetricsPublisher(TelemetryClient client)
+        public MetricValueCollectionWrapper Convert(string info)
         {
-            this.client = client;
-            InitializeMetrics();
-        }
+            var exchanges = JArray.Parse(info);
 
-        private void InitializeMetrics()
-        {
-            queueStats = client.GetMetric(new MetricIdentifier(MetricsNamespace, "Exchange", "Type", "Name"));
-        }
+            var collection = new MetricValueCollectionWrapper();
 
-        public override void Publish(string info)
-        {
-            var queues = JArray.Parse(info);
-
-            foreach (var q in queues)
+            foreach (var q in exchanges)
             {
                 if (q.SelectToken(MessageStats) == null)
                 {
@@ -64,10 +65,12 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
                 for (var i = 0; i < PathsWithDetailRate.Length; i++)
                 {
                     var pathValue = PathsWithDetailRate[i];
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), DimensionTranslations[i], exchangeName);
-                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], exchangeName);
+                    collection.Add(q.ValueFromPath<float?>($"{pathValue}"), DimensionTranslations[i], exchangeName);
+                    collection.Add(q.ValueFromPath<float?>($"{pathValue}{DetailsRateSuffix}"), DimensionRateTranslations[i], exchangeName);
                 }
             }
+
+            return collection;
         }
     }
 }

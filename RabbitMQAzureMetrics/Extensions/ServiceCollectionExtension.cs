@@ -1,22 +1,24 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQAzureMetrics.Consumer;
 
 namespace RabbitMQAzureMetrics
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection serviceCollection, RabbitMetricsConfiguration configuration)
+        public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection services, RabbitMetricsConfiguration configuration)
         {
             configuration.Validate();
-            serviceCollection.AddSingleton(configuration);
-            serviceCollection.AddHostedService<RabbitMqBackgroundService>();
+            services.AddSingleton(configuration);
+            services.AddHostedService<RabbitMqBackgroundService>();
 
             var telemetryConfig = TelemetryConfiguration.CreateDefault();
             telemetryConfig.InstrumentationKey = configuration.AppInsightsKey;
             var telemetryClient = new TelemetryClient(telemetryConfig);
-            serviceCollection.AddSingleton(telemetryClient);
-            return serviceCollection;
+            services.AddSingleton(telemetryClient);
+            services.AddMetricsConsumer(configuration.RabbitMqUserName, configuration.RabbitMqPassword);
+            return services;
         }
     }
 }

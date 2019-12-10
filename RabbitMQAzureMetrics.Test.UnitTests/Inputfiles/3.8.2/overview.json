@@ -1,0 +1,204 @@
+{
+    "management_version": "3.8.2",
+    "rates_mode": "basic",
+    "sample_retention_policies": {
+        "global": [
+            600,
+            3600,
+            28800,
+            86400
+        ],
+        "basic": [
+            600,
+            3600
+        ],
+        "detailed": [
+            600
+        ]
+    },
+    "exchange_types": [
+        {
+            "name": "direct",
+            "description": "AMQP direct exchange, as per the AMQP specification",
+            "enabled": true
+        },
+        {
+            "name": "fanout",
+            "description": "AMQP fanout exchange, as per the AMQP specification",
+            "enabled": true
+        },
+        {
+            "name": "headers",
+            "description": "AMQP headers exchange, as per the AMQP specification",
+            "enabled": true
+        },
+        {
+            "name": "topic",
+            "description": "AMQP topic exchange, as per the AMQP specification",
+            "enabled": true
+        }
+    ],
+    "rabbitmq_version": "3.8.2",
+    "cluster_name": "rabbit@localhost",
+    "erlang_version": "22.1.8",
+    "erlang_full_version": "Erlang/OTP 22 [erts-10.5.6] [source] [64-bit] [smp:2:2] [ds:2:2:10] [async-threads:64]",
+    "disable_stats": false,
+    "enable_queue_totals": false,
+    "message_stats": {
+        "ack": 99.1,
+        "ack_details": {
+            "rate": 99.1
+        },
+        "confirm": 99.1,
+        "confirm_details": {
+            "rate": 99.1
+        },
+        "deliver": 99.1,
+        "deliver_details": {
+            "rate": 99.1
+        },
+        "deliver_get": 99.1,
+        "deliver_get_details": {
+            "rate": 99.1
+        },
+        "deliver_no_ack": 99.1,
+        "deliver_no_ack_details": {
+            "rate": 99.1
+        },
+        "disk_reads": 99.1,
+        "disk_reads_details": {
+            "rate": 99.1
+        },
+        "disk_writes": 99.1,
+        "disk_writes_details": {
+            "rate": 99.1
+        },
+        "drop_unroutable": 1,
+        "drop_unroutable_details": {
+            "rate": 99.1
+        },
+        "get": 99.1,
+        "get_details": {
+            "rate": 99.1
+        },
+        "get_empty": 99.1,
+        "get_empty_details": {
+            "rate": 99.1
+        },
+        "get_no_ack": 99.1,
+        "get_no_ack_details": {
+            "rate": 99.1
+        },
+        "publish": 99.1,
+        "publish_details": {
+            "rate": 99.1
+        },
+        "redeliver": 99.1,
+        "redeliver_details": {
+            "rate": 99.1
+        },
+        "return_unroutable": 99.1,
+        "return_unroutable_details": {
+            "rate": 99.1
+        }
+    },
+    "churn_rates": {
+        "channel_closed": 99.1,
+        "channel_closed_details": {
+            "rate": 99.1
+        },
+        "channel_created": 99.1,
+        "channel_created_details": {
+            "rate": 99.1
+        },
+        "connection_closed": 99.1,
+        "connection_closed_details": {
+            "rate": 99.1
+        },
+        "connection_created": 99.1,
+        "connection_created_details": {
+            "rate": 99.1
+        },
+        "queue_created": 1,
+        "queue_created_details": {
+            "rate": 99.1
+        },
+        "queue_declared": 1,
+        "queue_declared_details": {
+            "rate": 99.1
+        },
+        "queue_deleted": 1,
+        "queue_deleted_details": {
+            "rate": 99.1
+        }
+    },
+    "queue_totals": {
+        "messages": 99.1,
+        "messages_details": {
+            "rate": 99.1
+        },
+        "messages_ready": 99.1,
+        "messages_ready_details": {
+            "rate": 99.1
+        },
+        "messages_unacknowledged": 99.1,
+        "messages_unacknowledged_details": {
+            "rate": 99.1
+        }
+    },
+    "object_totals": {
+        "channels": 99.1,
+        "connections": 99.1,
+        "consumers": 99.1,
+        "exchanges": 8,
+        "queues": 1
+    },
+    "statistics_db_event_queue": 99.1,
+    "node": "rabbit@localhost",
+    "listeners": [
+        {
+            "node": "rabbit@localhost",
+            "protocol": "amqp",
+            "ip_address": "::",
+            "port": 5672,
+            "socket_opts": {
+                "backlog": 128,
+                "nodelay": true,
+                "linger": [
+                    true,
+                    0
+                ],
+                "exit_on_close": false
+            }
+        },
+        {
+            "node": "rabbit@localhost",
+            "protocol": "clustering",
+            "ip_address": "::",
+            "port": 25672,
+            "socket_opts": []
+        },
+        {
+            "node": "rabbit@localhost",
+            "protocol": "http",
+            "ip_address": "::",
+            "port": 15672,
+            "socket_opts": {
+                "cowboy_opts": {
+                    "sendfile": false
+                },
+                "port": 15672
+            }
+        }
+    ],
+    "contexts": [
+        {
+            "ssl_opts": [],
+            "node": "rabbit@localhost",
+            "description": "RabbitMQ Management",
+            "path": "/",
+            "cowboy_opts": "[{sendfile,false}]",
+            "port": "15672"
+        }
+    ]
+}
