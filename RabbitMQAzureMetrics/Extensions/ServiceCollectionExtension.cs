@@ -1,10 +1,11 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.DependencyInjection;
-using RabbitMQAzureMetrics.Consumer;
-
-namespace RabbitMQAzureMetrics
+﻿namespace RabbitMQAzureMetrics
 {
+    using Microsoft.ApplicationInsights;
+    using Microsoft.ApplicationInsights.Extensibility;
+    using Microsoft.Extensions.DependencyInjection;
+    using RabbitMQAzureMetrics.Configuration;
+    using RabbitMQAzureMetrics.Consumer;
+
     public static class ServiceCollectionExtension
     {
         public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection services, RabbitMetricsConfiguration configuration)

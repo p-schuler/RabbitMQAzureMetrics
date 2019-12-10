@@ -1,13 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
-using RabbitMQAzureMetrics.Extensions;
-using RabbitMQAzureMetrics.MetricsValueConverters;
-using System.Collections.Generic;
-
-namespace RabbitMQAzureMetrics.ValuePublishers.Overview
+﻿namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
+    using System.Collections.Generic;
+    using Newtonsoft.Json.Linq;
+    using RabbitMQAzureMetrics.Extensions;
+    using RabbitMQAzureMetrics.MetricsValueConverters;
+
     public class MessageOverviewValueConverter : IMetricsValueConverter
     {
-        private readonly static string[] ChurnRatesPaths = new[]
+        private const string ChurnRates = "churn_rates";
+
+        private static readonly string[] ChurnRatesPaths = new[]
         {
             "channel_closed",
             "channel_created",
@@ -15,12 +17,12 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "connection_created",
             "queue_created",
             "queue_declared",
-            "queue_deleted"
+            "queue_deleted",
         };
 
-        private readonly static string[] DimensionTranslations = new[]
+        private static readonly string[] DimensionTranslations = new[]
         {
-            "Total channels closed",// "channel_closed",
+            "Total channels closed", // "channel_closed",
             "Total channels created", // "channel_created",
             "Total connections closed", // "connection_closed",
             "Total connections created", // "connection_created",
@@ -28,8 +30,6 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Total queues declared", // "queue_declared",
             "Total queues deleted", // "queue_deleted"
         };
-
-        private const string ChurnRates = "churn_rates";
 
         private static List<string> publishedMetrics;
 
@@ -41,6 +41,7 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
                 {
                     publishedMetrics = new List<string>(DimensionTranslations);
                 }
+
                 return publishedMetrics;
             }
         }

@@ -1,12 +1,9 @@
-﻿using RabbitMQAzureMetrics.MetricsValueConverters;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace RabbitMQAzureMetrics.Consumer
+﻿namespace RabbitMQAzureMetrics.Consumer
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using RabbitMQAzureMetrics.MetricsValueConverters;
+
     public interface IMetricConsumer
     {
         Task<MetricValueCollectionWrapper> ConsumeAsync(CancellationToken cancellationToken = default);

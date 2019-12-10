@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RabbitMQAzureMetrics.Consumer
+﻿namespace RabbitMQAzureMetrics.Consumer
 {
     public class Constants
     {

@@ -1,29 +1,29 @@
-﻿using Newtonsoft.Json.Linq;
-using RabbitMQAzureMetrics.Extensions;
-using RabbitMQAzureMetrics.MetricsValueConverters;
-using System;
-using System.Collections.Generic;
-
-namespace RabbitMQAzureMetrics.ValuePublishers.Overview
+﻿namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
+    using System;
+    using System.Collections.Generic;
+    using Newtonsoft.Json.Linq;
+    using RabbitMQAzureMetrics.Extensions;
+    using RabbitMQAzureMetrics.MetricsValueConverters;
+
     public class QueueValueConverter : IMetricsValueConverter
     {
         private const string MessageStats = "message_stats";
         private const string DetailsRateSuffix = "_details.rate";
 
-        private readonly static string[] Paths = new[]
+        private static readonly string[] Paths = new[]
         {
             "consumers",
-            "consumer_utilisation"
+            "consumer_utilisation",
         };
 
-        private readonly static string[] PathsDimensionTranslations = new[]
+        private static readonly string[] PathsDimensionTranslations = new[]
         {
             "Consumer: Count",
-            "Consumer: Utilisation"
+            "Consumer: Utilisation",
         };
 
-        private readonly static string[] PathsWithDetailRate = new[]
+        private static readonly string[] PathsWithDetailRate = new[]
         {
             "messages",
             "messages_ready",
@@ -34,10 +34,10 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             MessageStats + ".get",
             MessageStats + ".get_no_ack",
             MessageStats + ".publish",
-            MessageStats + ".redeliver"
+            MessageStats + ".redeliver",
         };
 
-        private readonly static string[] StatsDimensionTranslations = new[]
+        private static readonly string[] StatsDimensionTranslations = new[]
         {
             "Total number of messages",
             "Messages ready for delivery",
@@ -51,31 +51,36 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Count of subset of messages in deliver_get which had the redelivered flag set.", // redliver
         };
 
-        private readonly static string[] StatsDimensionRateTranslations = new[]
+        private static readonly string[] StatsDimensionRateTranslations = new[]
         {
-            "Rate: Total number of messages", //"messages",
-            "Rate: Messages ready for delivery", //"messages_ready",
-            "Rate: Number of unacknowledged messages", //"messages_unacknowledged",
+            "Rate: Total number of messages", // "messages",
+            "Rate: Messages ready for delivery", // "messages_ready",
+            "Rate: Number of unacknowledged messages", // "messages_unacknowledged",
             "Rate: Total number of messages in ack mode", // MessageStats + ".ack",
-            "Rate: Messages delivered recently (of all modes)", //MessageStats + ".deliver_get",
-            "Rate: Messages delivered in no-ack mode to consumers.", //MessageStats + ".deliver_no_ack",
-            "Rate: Messages delivered in ack mode in response to basic.get", //MessageStats + ".get",
-            "Rate: Messages delivered in no-ack mode in response to basic.get", //MessageStats + ".get_no_ack",
-            "Rate: Message publishing", //MessageStats + ".publish",
-            "Rate: Count of subset of messages in deliver_get which had the redelivered flag set.", //MessageStats + ".redeliver"
+            "Rate: Messages delivered recently (of all modes)", // MessageStats + ".deliver_get",
+            "Rate: Messages delivered in no-ack mode to consumers.", // MessageStats + ".deliver_no_ack",
+            "Rate: Messages delivered in ack mode in response to basic.get", // MessageStats + ".get",
+            "Rate: Messages delivered in no-ack mode in response to basic.get", // MessageStats + ".get_no_ack",
+            "Rate: Message publishing", // MessageStats + ".publish",
+            "Rate: Count of subset of messages in deliver_get which had the redelivered flag set.", // MessageStats + ".redeliver"
         };
 
-        private enum CalculationType
+        private static readonly string[] CalculationTranslations = new[]
         {
-            DeliveryDelay = 0
-        }
+            "Rate: delivery delay",
+        };
 
-        private readonly static string[] CalculationTranslations = new[] 
+        private static readonly Action<JToken, MetricValueCollectionWrapper, string>[] Calculations = new Action<JToken, MetricValueCollectionWrapper, string>[]
         {
-            "Rate: delivery delay"
+            CalculateDeliveryDelay,
         };
 
         private static List<string> publishedMetrics;
+
+        private enum CalculationType
+        {
+            DeliveryDelay = 0,
+        }
 
         public static IList<string> PublishedMetrics
         {
@@ -88,15 +93,10 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
                     publishedMetrics.AddRange(PathsDimensionTranslations);
                     publishedMetrics.AddRange(CalculationTranslations);
                 }
+
                 return publishedMetrics;
             }
         }
-
-        private readonly static Action<JToken, MetricValueCollectionWrapper, string>[] Calculations = new Action<JToken, MetricValueCollectionWrapper, string>[]
-        {
-            CalculateDeliveryDelay
-        };
-
 
         public MetricValueCollectionWrapper Convert(string info)
         {
@@ -133,9 +133,9 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
         /// Calculates the delay of the delivery relative to the publishing of the messages and publishes
         /// that value in the passed in metric.
         /// </summary>
-        /// <param name="jToken"></param>
-        /// <param name="targetMetric"></param>
-        /// <param name="queueName"></param>
+        /// <param name="jToken">Token to use to parse.</param>
+        /// <param name="collection">The collection to store the value.</param>
+        /// <param name="queueName">The queue name of the metric.</param>
         private static void CalculateDeliveryDelay(JToken jToken, MetricValueCollectionWrapper collection, string queueName)
         {
             var deliverRate = jToken.ValueFromPath<float>(MessageStats + ".deliver_get" + DetailsRateSuffix);

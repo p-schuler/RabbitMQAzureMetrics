@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using RabbitMQAzureMetrics.Configuration;
 using RabbitMQAzureMetrics.Consumer;
 using RabbitMQAzureMetrics.Processors;
 using RabbitMQAzureMetrics.ValuePublishers.Overview;

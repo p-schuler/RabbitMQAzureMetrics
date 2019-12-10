@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
+using RabbitMQAzureMetrics.Configuration;
 using RabbitMQAzureMetrics.Consumer;
 using RabbitMQAzureMetrics.Processors;
 using RabbitMQAzureMetrics.ValuePublishers.Overview;

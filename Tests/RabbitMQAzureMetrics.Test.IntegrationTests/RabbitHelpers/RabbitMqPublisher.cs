@@ -1,7 +1,4 @@
-using Polly;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,8 +28,6 @@ namespace RabbitMQAzureMetrics.Test.IntegrationTests
 
             this.currentTask = Task.Run(async () => 
             {
-                var factory = new ConnectionFactory() { HostName = "localhost" };
-                
                 using (connection)
                 using (channel)
                 {
