@@ -18,7 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\debugerr.Test.Common\debugerr.Test.Common.csproj" />
     <ProjectReference Include="..\DockerIntegrationTestHelper\DockerIntegrationTestHelper.csproj" />
-    <ProjectReference Include="..\RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj" />
+    <ProjectReference Include="..\..\RabbitMQAzureMetrics\RabbitMQAzureMetrics.csproj" />
   </ItemGroup>
 
 </Project>
