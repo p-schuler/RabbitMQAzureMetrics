@@ -1,0 +1,116 @@
+[
+    {
+        "arguments": {},
+        "auto_delete": true,
+        "backing_queue_status": {
+            "avg_ack_egress_rate": 99.1,
+            "avg_ack_ingress_rate": 99.1,
+            "avg_egress_rate": 99.1,
+            "avg_ingress_rate": 99.1,
+            "delta": [
+                "delta",
+                "undefined",
+                0,
+                0,
+                "undefined"
+            ],
+            "len": 0,
+            "mode": "default",
+            "next_seq_id": 0,
+            "q1": 0,
+            "q2": 0,
+            "q3": 0,
+            "q4": 0,
+            "target_ram_count": "infinity"
+        },
+        "consumer_utilisation": null,
+        "consumers": 99.1,
+        "durable": false,
+        "effective_policy_definition": {},
+        "exclusive": true,
+        "exclusive_consumer_tag": null,
+        "garbage_collection": {
+            "fullsweep_after": 65535,
+            "max_heap_size": 99.1,
+            "min_bin_vheap_size": 46422,
+            "min_heap_size": 233,
+            "minor_gcs": 2
+        },
+        "head_message_timestamp": null,
+        "memory": 42564,
+        "message_bytes": 99.1,
+        "message_bytes_paged_out": 99.1,
+        "message_bytes_persistent": 99.1,
+        "message_bytes_ram": 99.1,
+        "message_bytes_ready": 99.1,
+        "message_bytes_unacknowledged": 99.1,
+        "message_stats": {
+            "ack": 99.1,
+            "ack_details": {
+                "rate": 99.1
+            },
+            "deliver": 99.1,
+            "deliver_details": {
+                "rate": 99.1
+            },
+            "deliver_get": 99.1,
+            "deliver_get_details": {
+                "rate": 99.1
+            },
+            "deliver_no_ack": 99.1,
+            "deliver_no_ack_details": {
+                "rate": 99.1
+            },
+            "get": 99.1,
+            "get_details": {
+                "rate": 99.1
+            },
+            "get_empty": 99.1,
+            "get_empty_details": {
+                "rate": 99.1
+            },
+            "get_no_ack": 99.1,
+            "get_no_ack_details": {
+                "rate": 99.1
+            },
+            "publish": 99.1,
+            "publish_details": {
+                "rate": 99.1
+            },
+            "redeliver": 99.1,
+            "redeliver_details": {
+                "rate": 99.1
+            }
+        },
+        "messages": 99.1,
+        "messages_details": {
+            "rate": 99.1
+        },
+        "messages_paged_out": 99.1,
+        "messages_persistent": 99.1,
+        "messages_ram": 99.1,
+        "messages_ready": 99.1,
+        "messages_ready_details": {
+            "rate": 99.1
+        },
+        "messages_ready_ram": 99.1,
+        "messages_unacknowledged": 99.1,
+        "messages_unacknowledged_details": {
+            "rate": 99.1
+        },
+        "messages_unacknowledged_ram": 99.1,
+        "name": "amq.gen-igTHZdGxeCDTKvjRTh03wQ",
+        "node": "rabbit@localhost",
+        "operator_policy": null,
+        "policy": null,
+        "recoverable_slaves": null,
+        "reductions": 3081,
+        "reductions_details": {
+            "rate": 99.1
+        },
+        "single_active_consumer_tag": null,
+        "state": "running",
+        "type": "classic",
+        "vhost": "/"
+    }
+]

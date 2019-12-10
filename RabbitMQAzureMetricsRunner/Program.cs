@@ -21,19 +21,17 @@ namespace RabbitMQAzureMetrics
         private static IHostBuilder Setup(string[] args)
         {
             var hostBuilder = new HostBuilder()
-                .ConfigureLogging((ctx, config) =>
+                .ConfigureLogging((ctx, logging) =>
                 {
-                    config.AddConsole();
-                })
-                .ConfigureHostConfiguration(cfg =>
-                {
-                    cfg.AddEnvironmentVariables();
+                    logging.AddConfiguration(ctx.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
                 })
                 .ConfigureAppConfiguration((ctx, config) =>
                 {
-                    config.AddJsonFile("appsettings.json", true);
-                    config.AddJsonFile("appesttings.local.json", optional: true);
+                    config.AddJsonFile("appsettings.json", false);
+                    config.AddJsonFile("appsettings.local.json", true);
                     config.AddCommandLine(args);
+                    config.AddEnvironmentVariables();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {

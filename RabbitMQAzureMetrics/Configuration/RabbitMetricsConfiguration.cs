@@ -4,10 +4,10 @@ namespace RabbitMQAzureMetrics
 {
     public class RabbitMetricsConfiguration
     {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public int Port { get; set; } = 15672;
-        public string Hostname { get; set; }
+        public string RabbitMqUserName { get; set; } = "guest";
+        public string RabbitMqPassword { get; set; } = "guest";
+        public int RabbitMqPort { get; set; } = 15672;
+        public string RabbitMqHost { get; set; } = "localhost";
         public bool UseSSL { get; set; }
         public int PollingInterval { get; set; } = 5_000;
         public int FlushDelay { get; set; } = 30_000;
@@ -15,9 +15,9 @@ namespace RabbitMQAzureMetrics
 
         internal void Validate()
         {
-            if (String.IsNullOrWhiteSpace(UserName)) throw new ArgumentException("Missing configuration", nameof(UserName));
-            if (String.IsNullOrWhiteSpace(Password)) throw new ArgumentException("Missing configuration", nameof(Password));
-            if (String.IsNullOrWhiteSpace(Hostname)) throw new ArgumentException("Missing configuration", nameof(Hostname));
+            if (String.IsNullOrWhiteSpace(RabbitMqUserName)) throw new ArgumentException("Missing configuration", nameof(RabbitMqUserName));
+            if (String.IsNullOrWhiteSpace(RabbitMqPassword)) throw new ArgumentException("Missing configuration", nameof(RabbitMqPassword));
+            if (String.IsNullOrWhiteSpace(RabbitMqHost)) throw new ArgumentException("Missing configuration", nameof(RabbitMqHost));
             if (String.IsNullOrWhiteSpace(AppInsightsKey)) throw new ArgumentException("Missing configuration", nameof(AppInsightsKey));
         }
     }

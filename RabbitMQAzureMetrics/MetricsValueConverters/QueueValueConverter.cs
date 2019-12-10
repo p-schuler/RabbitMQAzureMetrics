@@ -1,38 +1,26 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Metrics;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using RabbitMQAzureMetrics.Extensions;
+using RabbitMQAzureMetrics.MetricsValueConverters;
 using System;
+using System.Collections.Generic;
 
 namespace RabbitMQAzureMetrics.ValuePublishers.Overview
 {
-    public class QueueMetricsPublisher : ValuePublisher
+    public class QueueValueConverter : IMetricsValueConverter
     {
-        private readonly TelemetryClient client;
-
-        private Metric queueStats;
-
         private const string MessageStats = "message_stats";
         private const string DetailsRateSuffix = "_details.rate";
 
-        private readonly static string[] FloatPaths = new[]
-        {
-            "consumer_utilisation"
-        };
-
-        private readonly static string[] FloatPathsDimensionTranslations = new[]
-        {
-            "Consumer: Utilisation"
-        };
-
         private readonly static string[] Paths = new[]
         {
-            "consumers"
+            "consumers",
+            "consumer_utilisation"
         };
 
         private readonly static string[] PathsDimensionTranslations = new[]
         {
-            "Consumer: Count"
+            "Consumer: Count",
+            "Consumer: Utilisation"
         };
 
         private readonly static string[] PathsWithDetailRate = new[]
@@ -77,24 +65,42 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
             "Rate: Count of subset of messages in deliver_get which had the redelivered flag set.", //MessageStats + ".redeliver"
         };
 
-        private readonly static Action<JToken, Metric, string>[] Calculations = new Action<JToken, Metric, string>[]
+        private enum CalculationType
+        {
+            DeliveryDelay = 0
+        }
+
+        private readonly static string[] CalculationTranslations = new[] 
+        {
+            "Rate: delivery delay"
+        };
+
+        private static List<string> publishedMetrics;
+
+        public static IList<string> PublishedMetrics
+        {
+            get
+            {
+                if (publishedMetrics == null)
+                {
+                    publishedMetrics = new List<string>(StatsDimensionRateTranslations);
+                    publishedMetrics.AddRange(StatsDimensionTranslations);
+                    publishedMetrics.AddRange(PathsDimensionTranslations);
+                    publishedMetrics.AddRange(CalculationTranslations);
+                }
+                return publishedMetrics;
+            }
+        }
+
+        private readonly static Action<JToken, MetricValueCollectionWrapper, string>[] Calculations = new Action<JToken, MetricValueCollectionWrapper, string>[]
         {
             CalculateDeliveryDelay
         };
 
-        public QueueMetricsPublisher(TelemetryClient client)
-        {
-            this.client = client;
-            InitializeMetrics();
-        }
 
-        private void InitializeMetrics()
+        public MetricValueCollectionWrapper Convert(string info)
         {
-            queueStats = client.GetMetric(new MetricIdentifier(MetricsNamespace, "Queue", "Type", "Name"));
-        }
-
-        public override void Publish(string info)
-        {
+            var collection = new MetricValueCollectionWrapper();
             var queues = JArray.Parse(info);
 
             foreach (var q in queues)
@@ -104,27 +110,23 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
                 for (var i = 0; i < PathsWithDetailRate.Length; i++)
                 {
                     var pathValue = PathsWithDetailRate[i];
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), StatsDimensionTranslations[i], qName);
-                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}{DetailsRateSuffix}"), StatsDimensionRateTranslations[i], qName);
+                    collection.Add(q.ValueFromPath<float?>($"{pathValue}"), StatsDimensionTranslations[i], qName);
+                    collection.Add(q.ValueFromPath<float?>($"{pathValue}{DetailsRateSuffix}"), StatsDimensionRateTranslations[i], qName);
                 }
 
                 for (var i = 0; i < Paths.Length; i++)
                 {
                     var pathValue = Paths[i];
-                    queueStats.TrackValue(q.ValueFromPath<int>($"{pathValue}"), PathsDimensionTranslations[i], qName);
-                }
-
-                for (var i = 0; i < FloatPaths.Length; i++)
-                {
-                    var pathValue = FloatPaths[i];
-                    queueStats.TrackValue(q.ValueFromPath<float>($"{pathValue}"), FloatPathsDimensionTranslations[i], qName);
+                    collection.Add(q.ValueFromPath<float?>($"{pathValue}"), PathsDimensionTranslations[i], qName);
                 }
 
                 for (var i = 0; i < Calculations.Length; i++)
                 {
-                    Calculations[i](q, queueStats, qName);
+                    Calculations[i](q, collection, qName);
                 }
             }
+
+            return collection;
         }
 
         /// <summary>
@@ -134,13 +136,13 @@ namespace RabbitMQAzureMetrics.ValuePublishers.Overview
         /// <param name="jToken"></param>
         /// <param name="targetMetric"></param>
         /// <param name="queueName"></param>
-        private static void CalculateDeliveryDelay(JToken jToken, Metric targetMetric, string queueName)
+        private static void CalculateDeliveryDelay(JToken jToken, MetricValueCollectionWrapper collection, string queueName)
         {
             var deliverRate = jToken.ValueFromPath<float>(MessageStats + ".deliver_get" + DetailsRateSuffix);
             var publishRate = jToken.ValueFromPath<float>(MessageStats + ".publish" + DetailsRateSuffix);
 
             var relativeDelay = (publishRate > 0) ? Math.Round(1 - (deliverRate / publishRate), 2) : 0;
-            targetMetric.TrackValue(relativeDelay, "Rate: delivery delay", queueName);
+            collection.Add((float)relativeDelay, CalculationTranslations[(int)CalculationType.DeliveryDelay], queueName);
         }
     }
 }

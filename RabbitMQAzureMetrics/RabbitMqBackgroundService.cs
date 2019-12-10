@@ -1,6 +1,8 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQAzureMetrics.Consumer;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,12 +14,14 @@ namespace RabbitMQAzureMetrics
         private readonly RabbitMQMetricsProcessor processor;
 
         public RabbitMqBackgroundService(ILogger<RabbitMqBackgroundService> logger, 
-                                         IApplicationLifetime appLifetime, 
+                                         IHostApplicationLifetime appLifetime, 
                                          TelemetryClient telemetryClient,
-                                         RabbitMetricsConfiguration configuration)
+                                         RabbitMetricsConfiguration configuration,
+                                         IHttpClientFactory clientFactory,
+                                         ILogger<RabbitMqMetricsConsumer> metricsConsumerLogger)
         {
             this.logger = logger;
-            processor = new RabbitMQMetricsProcessor(telemetryClient, configuration, logger, appLifetime);
+            processor = new RabbitMQMetricsProcessor(telemetryClient, configuration, logger, clientFactory, metricsConsumerLogger, appLifetime);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
