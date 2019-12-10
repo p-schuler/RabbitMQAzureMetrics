@@ -3,6 +3,15 @@ Collects metrics from RabbitMq and publishes them into an App Insight instance o
 
 The code is accesses the [RabbitMQ management HTTP API](https://rawcdn.githack.com/rabbitmq/rabbitmq-management/v3.8.2/priv/www/api/index.html). Not all metrics that this API exposes are currently collected. See [Collected Metrics](#collected-metrics)
 
+## Build status
+Due to security considerations, build logs are not publicly available.
+
+| Service Environment      | Status |
+| ---                      | ---    |
+| Master                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Dev%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=14)|
+| Dev                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Master%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=13)|
+
+
 # Supported Versions
 This code was tested against management version of RabbitMQ 3.8.2. Other versions might work unless RabbitMQ changes the API format of the management metrics API.
 
@@ -26,7 +35,24 @@ This code was tested against management version of RabbitMQ 3.8.2. Other version
 
 ## Metrics collector
 1. docker run -d --link local-rabbit --env AppInsightsKey={your app insights key} --name metrics-collector pschuler.azurecr.io/rabbitmqmetricspublisher:latest
-2. 
+2. check the logs of the metrics collector. You should see that it started the processor
+
+## Start publishing messages
+You can write your own pub/sub or you can use the example in Examples/StatsGenerator to publish and subscribe to a fanout/queue in the local RabbitMQ instance. **Note**: this only works, if you are using the above configuration of a local RabbitMQ installation.
+
+## Validate
+Once you started publishing messages you can verify the metrics in Application Insights you created [here](#application-insights).
+1. Open your Application Insights instance in Azure portal
+2. Select Metrics from the Menu
+3. Select rabbitmq from the "Metric Namespace" drop down (**Note:** if it does not yet appear, give it some time to publish the first metrics)
+4. Select "Exchange" from the "Metric" drop down
+
+# Using custom metrics
+You can use the published custom metrics to filter on the metric type and split on the queue name:
+1. Select "Queue" from the "Metric" drop down
+2. Click on "Add Filter", select "Type" and then select a metric type from the "VALUES" drop down (for example "Rate: Message publishing")
+3. Now you should only see the values for that particular metric
+4. If you have multiple queues, you can see that particular metric per queue, by adding a split on the name (Apply splitting).
 
 # Collected Metrics
 Currently those metrics are being collected
