@@ -9,13 +9,13 @@ namespace StatsGenerator
     public class RabbitMqPublisher : RabbitMqClient
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly int publisherDelay;
+        private readonly int maxPublisherDelay;
         private Task currentTask;
         public int MessagesPublished { get; }
 
-        public RabbitMqPublisher(int publisherDelay = 50)
+        public RabbitMqPublisher(int maxPublisherDelay = 500)
         {
-            this.publisherDelay = publisherDelay;
+            this.maxPublisherDelay = maxPublisherDelay;
         }
 
         public async Task StartAsync()
@@ -31,13 +31,15 @@ namespace StatsGenerator
 
                 Console.WriteLine("publishing messages...");
 
+                var rnd = new Random();
+
                 while (!this.cts.IsCancellationRequested)
                 {
                     Model.BasicPublish(exchange: Constants.ExchangeName,
                                         routingKey: "",
                                         basicProperties: null,
                                         body: body);
-                    await Task.Delay(publisherDelay);
+                    await Task.Delay(rnd.Next(0, maxPublisherDelay));
                 }
             });
         }
