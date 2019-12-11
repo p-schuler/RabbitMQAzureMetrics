@@ -1,15 +1,15 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using RabbitMQAzureMetrics.Configuration;
-
-namespace RabbitMQAzureMetrics
+﻿namespace RabbitMQAzureMetrics
 {
-    class Program
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using RabbitMQAzureMetrics.Configuration;
+
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var hostBuilder = Setup(args);
             using (var host = hostBuilder.Build())

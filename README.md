@@ -7,7 +7,6 @@ The code is accesses the [RabbitMQ management HTTP API](https://rawcdn.githack.c
 | Service Environment      | Status |
 | ---                      | ---    |
 | Master                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Master%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=14)|
-| Dev                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Dev%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=13)|
 
 
 # Supported Versions
