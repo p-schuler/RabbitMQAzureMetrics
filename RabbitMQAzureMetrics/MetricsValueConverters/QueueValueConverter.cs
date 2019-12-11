@@ -20,7 +20,7 @@
         private static readonly string[] PathsDimensionTranslations = new[]
         {
             "Consumer: Count",
-            "Consumer: Utilisation",
+            "Consumer: Utilization",
         };
 
         private static readonly string[] PathsWithDetailRate = new[]
