@@ -43,7 +43,7 @@
             "Messages ready for delivery",
             "Number of unacknowledged messages",
             "Total number of messages in ack mode", // MessageStats + ".ack",
-            "Messages delivered recently (of all modes)", // deliver_get
+            "Messages delivered recently of all modes", // deliver_get
             "Messages delivered in no-ack mode to consumers.", // deliver_no_ack
             "Messages delivered in ack mode in response to basic.get", // get
             "Messages delivered in no-ack mode in response to basic.get", // get_no_ack
@@ -57,7 +57,7 @@
             "Rate: Messages ready for delivery", // "messages_ready",
             "Rate: Number of unacknowledged messages", // "messages_unacknowledged",
             "Rate: Total number of messages in ack mode", // MessageStats + ".ack",
-            "Rate: Messages delivered recently (of all modes)", // MessageStats + ".deliver_get",
+            "Rate: Messages delivered recently of all modes", // MessageStats + ".deliver_get",
             "Rate: Messages delivered in no-ack mode to consumers.", // MessageStats + ".deliver_no_ack",
             "Rate: Messages delivered in ack mode in response to basic.get", // MessageStats + ".get",
             "Rate: Messages delivered in no-ack mode in response to basic.get", // MessageStats + ".get_no_ack",
