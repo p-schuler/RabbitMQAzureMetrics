@@ -133,8 +133,9 @@ message_stats.redeliver_details.rate | Rate: Count of subset of messages in deli
 
 # Calculated Queue Metrics
 Calculated Queue Metrics are additional metrics we found useful to have that are being calculated out of other metrics RabbitMQ provides
+
 Name | Description
------------- | -------------
+--- | ---
 Rate: delivery delay | Calculates the delay of the delivery (message_stats.deliver_get) relative to the publishing of the messages (message_stats.publish)
 
 
