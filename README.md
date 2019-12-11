@@ -71,7 +71,7 @@ You can use the published custom metrics to filter on the metric type and split 
 
 Here is an example of a metric split by queue name:
 
-![Metrics Chart](https://github.com/debugerr/RabbitMQAzureMetrics/documentation/images/metric_chart.JPG)
+![Metrics Chart](./documentation/images/metric_chart.JPG)
 
 ## Configure alerts
 Most likely, you want to add alerts that trigger, when a certain metric is reaching a specific value over time. This can be done using Alerts in Azure. 
@@ -86,7 +86,7 @@ Most likely, you want to add alerts that trigger, when a certain metric is reach
 8. Configure the threshold you need
 9. Go through the other steps required to alert you on the desired channel
 
-![Alert setup](https://github.com/debugerr/RabbitMQAzureMetrics/documentation/images/metric_alerts_2.jpg)
+![Alert setup](./documentation/images/metric_alerts_2.jpg)
 
 # Collected Metrics
 Currently those metrics are being collected
