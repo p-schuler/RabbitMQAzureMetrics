@@ -9,13 +9,26 @@ The code is accesses the [RabbitMQ management HTTP API](https://rawcdn.githack.c
 | Master                   | [![Build status](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_apis/build/status/Master%20Pipeline)](https://dev.azure.com/paschulecicd/RabbitMqMetricsPublisher/_build/latest?definitionId=14)|
 
 
-# Supported Versions
+## Supported Versions
 This code was tested against management version of RabbitMQ 3.8.2. Other versions might work unless RabbitMQ changes the API format of the management metrics API.
 
-# Prerequisits
+## Prerequisites
 1. [RabbitMQ](#rabbitmq) instance with the [Managment Plugin](https://www.rabbitmq.com/management.html)
 2. Application Insights
 3. Docker (you can host the publisher anywhere, docker is what this setup provides)
+
+## Configuration options
+| Name              | Description | Default |
+| ---               | ---         | ---     |
+| **RabbitMqHost**      | RabbitMQ host name - this has to be reachable by the collector | localhost |
+| **RabbitMqUserName**  | Username that will be used to access the management API (get this from your RabbitMQ setup)| guest |
+| **RabbitMqPassword**  | Pasword that will be used to access the management API (get this from your RabbitMQ setup)| guest |
+| **AppInsightsKey**  | Instrumentation Key obtained from your Application Insights instance on Azure| - |
+| **UseSSL**  | Set to true if your management API is secured using SSL otherwise false| false |
+| **PollingInterval**  | The interval that is used to fetch the values from the management API in milliseconds | 5000 |
+
+
+The values can be set in the appsettings.json file or set as environment variables (for docker you can use the --env syntax)
 
 # Setup
 ## RabbitMQ
@@ -76,7 +89,7 @@ message_stats.publish_out_details.rate | Rate of messages published out
 RabbitMQ Path | Description
 ------------ | -------------
 consumers | Consumer: Count
-consumer_utilisation | Consumer: Utilisation
+consumer_utilisation | Consumer: Utilization
 messages | Total number of messages
 messages_details.rate | Rate: Total number of messages
 messages_ready | Messages ready for delivery
