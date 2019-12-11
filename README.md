@@ -16,6 +16,7 @@ This code was tested against management version of RabbitMQ 3.8.2. Other version
 1. [RabbitMQ](#rabbitmq) instance with the [Managment Plugin](https://www.rabbitmq.com/management.html)
 2. Application Insights
 3. Docker (you can host the publisher anywhere, docker is what this setup provides)
+4. The Application Insights has to be setup in a [region that supports Custom Metrics](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-custom-overview#supported-regions)
 
 ## Configuration options
 | Name              | Description | Default |
