@@ -99,7 +99,7 @@ connection_closed | Total channels created
 connection_created | Total connections closed
 queue_created | Total queues created
 queue_declared | Total queues declared
-queue_deleted" | Total queues deleted
+queue_deleted | Total queues deleted
 
 ## Exchange Metrics
 RabbitMQ Path | Description
