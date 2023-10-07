@@ -1,4 +1,6 @@
-﻿namespace RabbitMQAzureMetrics.ValuePublishers.AppInsight
+﻿using RabbitMQAzureMetrics.ValuePublishers.Overview;
+
+namespace RabbitMQAzureMetrics.ValuePublishers.AppInsight
 {
     using Microsoft.ApplicationInsights;
     using Microsoft.ApplicationInsights.Metrics;
@@ -17,9 +19,11 @@
             return telemetryClient.GetMetric(new MetricIdentifier(MetricsNamespace, "Exchange", "Type", "Name"));
         }
 
-        public static Metric CreateQueueMetric(TelemetryClient telemetryClient)
+        public static Metric CreateQueueMetric(TelemetryClient telemetryClient, int queueLimit = 1_000)
         {
-            return telemetryClient.GetMetric(new MetricIdentifier(MetricsNamespace, "Queue", "Type", "Name"));
+            return telemetryClient.GetMetric(new MetricIdentifier(MetricsNamespace, "Queue", "Type", "Name"),
+                new MetricConfiguration(QueueValueConverter.PublishedMetrics.Count * queueLimit, queueLimit,
+                    new MetricSeriesConfigurationForMeasurement(restrictToUInt32Values: false)));
         }
     }
 }
