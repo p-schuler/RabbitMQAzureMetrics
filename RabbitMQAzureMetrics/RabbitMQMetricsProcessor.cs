@@ -90,7 +90,7 @@
                                              logger,
                                              new QueueValueConverter(),
                                              httpClientFactory),
-                        new TelemetryClientPublisher(MetricsDefinitions.CreateQueueMetric(client)));
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateQueueMetric(client), logger));
 
             var overviewProcessor = new DefaultMetricProcessor(
                         new RabbitMqMetricsConsumer(
@@ -99,7 +99,7 @@
                                              logger,
                                              new MessageOverviewValueConverter(),
                                              httpClientFactory),
-                        new TelemetryClientPublisher(MetricsDefinitions.CreateOverviewMetric(client)));
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateOverviewMetric(client), logger));
 
             var exchangeProcessor = new DefaultMetricProcessor(
                         new RabbitMqMetricsConsumer(
@@ -108,7 +108,7 @@
                                              logger,
                                              new ExchangeValueConverter(),
                                              httpClientFactory),
-                        new TelemetryClientPublisher(MetricsDefinitions.CreateExchangewMetric(client)));
+                        new TelemetryClientPublisher(MetricsDefinitions.CreateExchangewMetric(client), logger));
 
             var processors = new List<IMetricProcessor>(3);
 
