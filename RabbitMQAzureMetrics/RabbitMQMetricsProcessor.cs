@@ -46,39 +46,9 @@
             logger.LogInformation("Created {0} processors", this.processors.Count);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (this.ctsRunning != null)
-            {
-                throw new InvalidOperationException("Already running");
-            }
-
-            this.ctsRunning = new CancellationTokenSource();
-
-            this.runningTask = Task.Run(async () =>
-            {
-                using (var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(this.ctsRunning.Token, cancellationToken))
-                {
-                    await this.RunnerAsync(combinedToken.Token);
-                }
-            });
-
-            return Task.CompletedTask;
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            var runningToken = Interlocked.Exchange(ref this.ctsRunning, null);
-            if (runningToken == null)
-            {
-                throw new InvalidOperationException("Not running");
-            }
-
-            runningToken.Cancel();
-            await this.runningTask;
-
-            this.client.Flush();
-            this.runningTask = null;
+            await RunnerAsync(cancellationToken);
         }
 
         private static IList<IMetricProcessor> CreateProcessors(RabbitMetricsConfiguration configuration, TelemetryClient client, IHttpClientFactory httpClientFactory, ILogger<RabbitMqMetricsConsumer> logger)
@@ -124,33 +94,14 @@
             this.logger.LogInformation("Metrics processor is running");
             while (!cancellationToken.IsCancellationRequested)
             {
-                try
+                foreach (var t in this.processors)
                 {
-                    for (var i = 0; i < this.processors.Count; i++)
-                    {
-                        await this.processors[i].ProcessAsync(cancellationToken);
-                    }
-
-                    this.FlushIfRequired();
-
-                    await Task.Delay(Math.Max(MinPollingInterval, this.configuration.PollingInterval), cancellationToken);
+                    await t.ProcessAsync(cancellationToken);
                 }
-                catch (TaskCanceledException exception)
-                {
-                    this.logger.LogInformation(
-                        exception,
-                        "Stopping the metrics processor: {ErrorMessage}",
-                        exception.Message);
-                    break;
-                }
-                catch (Exception exception)
-                {
-                    this.logger.LogError(exception, "Unexpected error: {ErrorMessage}", exception.Message);
 
-                    Environment.ExitCode = -1;
-                    this.appLifetime.StopApplication();
-                    break;
-                }
+                this.FlushIfRequired();
+
+                await Task.Delay(Math.Max(MinPollingInterval, this.configuration.PollingInterval), cancellationToken);
             }
         }
 

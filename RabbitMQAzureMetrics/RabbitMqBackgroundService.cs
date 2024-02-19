@@ -9,7 +9,7 @@
     using RabbitMQAzureMetrics.Configuration;
     using RabbitMQAzureMetrics.Consumer;
 
-    internal class RabbitMqBackgroundService : IHostedService
+    internal class RabbitMqBackgroundService : BackgroundService
     {
         private readonly ILogger<RabbitMqBackgroundService> logger;
         private readonly RabbitMQMetricsProcessor processor;
@@ -26,16 +26,11 @@
             this.processor = new RabbitMQMetricsProcessor(telemetryClient, configuration, logger, clientFactory, metricsConsumerLogger, appLifetime);
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             this.logger.LogInformation("Starting RabbitMQ Metrics Service");
-            await this.processor.StartAsync(cancellationToken);
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            this.logger.LogInformation("Stopping RabbitMQ Metrics Service");
-            await this.processor.StopAsync(cancellationToken);
+            await this.processor.ExecuteAsync(stoppingToken);
+            this.logger.LogInformation("Stopped RabbitMQ Metrics Service");
         }
     }
 }
