@@ -68,7 +68,7 @@ namespace StatsGenerator
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
+                var message = Encoding.UTF8.GetString(body.Span);
                 lock (rnd)
                 {
                     Thread.Sleep(rnd.Next(0, consumeMaxDelay));
