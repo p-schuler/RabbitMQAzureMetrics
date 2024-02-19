@@ -29,7 +29,7 @@ namespace RabbitMQAzureMetrics.Test.UnitTests
                 if (Array.IndexOf(valuesToSkip, label) != -1)
                     continue;
 
-                Assert.IsTrue(NearlyEqual(DefaultValue, val.Value), $"Invalid value for '{val.Dimensions[0]}'");
+                Assert.That(NearlyEqual(DefaultValue, val.Value), $"Invalid value for '{val.Dimensions[0]}'");
             }
         }
 

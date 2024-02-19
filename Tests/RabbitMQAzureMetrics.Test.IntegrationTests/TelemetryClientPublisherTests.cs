@@ -14,6 +14,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace RabbitMQAzureMetrics.Test.IntegrationTests
 {
@@ -26,7 +28,7 @@ namespace RabbitMQAzureMetrics.Test.IntegrationTests
             var metricIdentifier = CreateMetricIdentifier(dimensions);
             var tc = new TelemetryClient(TelemetryConfiguration.CreateDefault());
             var metric = tc.GetMetric(metricIdentifier);
-            var publisher = new TelemetryClientPublisher(metric);
+            var publisher = new TelemetryClientPublisher(metric, Mock.Of<ILogger>());
             var collectionWrapper = new MetricValueCollectionWrapper();
             collectionWrapper.Add(0, dimensions);
 

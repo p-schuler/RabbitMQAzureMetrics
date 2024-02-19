@@ -128,21 +128,24 @@
                 {
                     for (var i = 0; i < this.processors.Count; i++)
                     {
-                        await this.processors[i].ProcessAsync();
+                        await this.processors[i].ProcessAsync(cancellationToken);
                     }
 
                     this.FlushIfRequired();
 
                     await Task.Delay(Math.Max(MinPollingInterval, this.configuration.PollingInterval), cancellationToken);
                 }
-                catch (TaskCanceledException)
+                catch (TaskCanceledException exception)
                 {
-                    this.logger.LogDebug("stopping the metrics processor");
+                    this.logger.LogInformation(
+                        exception,
+                        "Stopping the metrics processor: {ErrorMessage}",
+                        exception.Message);
                     break;
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    this.logger.LogError("Unexpected error: {error}", ex.Message);
+                    this.logger.LogError(exception, "Unexpected error: {ErrorMessage}", exception.Message);
 
                     Environment.ExitCode = -1;
                     this.appLifetime.StopApplication();

@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Docker.DotNet" Version="3.125.2" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
   </ItemGroup>
   
 </Project>

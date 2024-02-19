@@ -53,13 +53,13 @@ namespace RabbitMQAzureMetrics.Test.IntegrationTests
                         pollingInterval: 2000);
 
             // verify that there was nothing published
-            Assert.False(mre.WaitOne(1));
+            Assert.That(mre.WaitOne(1) == false);
 
             // start the container
             await RabbitMqTestFixture.RabbitTestContainer.StartAsync();
 
             // now the processor should recover
-            Assert.True(mre.WaitOne(60_000));
+            Assert.That(mre.WaitOne(60_000));
         }
 
         [Test]
